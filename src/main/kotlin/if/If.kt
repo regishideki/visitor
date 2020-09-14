@@ -27,28 +27,34 @@ class PanFormValidation: FormValidation {
 class Document
 class LoanApplication(val partner: Partner, val document: Document)
 
-class CreateLoanApplicationUseCase {
+class CreateLoanApplicationUseCase(
+    private val scdFormValidation: ScdFormValidation,
+    private val panFormValidation: PanFormValidation
+) {
     fun create(loanApplication: LoanApplication) {
         validate(loanApplication)
     }
 
     private fun validate(loanApplication: LoanApplication) {
         when(loanApplication.partner) {
-            is ScdPartner -> ScdFormValidation().validate(loanApplication)
-            is PanPartner -> PanFormValidation().validate(loanApplication)
+            is ScdPartner -> scdFormValidation.validate(loanApplication)
+            is PanPartner -> panFormValidation.validate(loanApplication)
         }
     }
 }
 
-class SendLoanApplicationDocumentUseCase {
+class SendLoanApplicationDocumentUseCase(
+    private val scdDocumentSender: ScdDocumentSender,
+    private val panDocumentSender: PanDocumentSender
+) {
     fun send(loanApplication: LoanApplication) {
         validate(loanApplication)
     }
 
     private fun validate(loanApplication: LoanApplication) {
         when(loanApplication.partner) {
-            is ScdPartner -> ScdDocumentSender().send(loanApplication.document)
-            is PanPartner -> PanDocumentSender().send(loanApplication.document)
+            is ScdPartner -> scdDocumentSender.send(loanApplication.document)
+            is PanPartner -> panDocumentSender.send(loanApplication.document)
         }
     }
 }
