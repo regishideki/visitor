@@ -32,23 +32,29 @@ interface PartnerResouceRegistry {
     fun resourceForScd(): PartnerResouce
     fun resourceForPan(): PartnerResouce
 }
+class PartnerFormValidationResouceRegistry: PartnerResouceRegistry {
+    override fun resourceForScd() = ScdFormValidation()
+    override fun resourceForPan() = PanFormValidation()
+}
 class PartnerDocumentResouceRegistry: PartnerResouceRegistry {
     override fun resourceForScd() = ScdDocumentSender()
     override fun resourceForPan() = PanDocumentSender()
 }
 
 class Document
-class LoanApplication(val partner: Partner, val document: Document)
+class LoanApplication(val partner: Partner, val document: Document) {
+    fun resourceFor(partnerResourceResouceRegistry: PartnerResouceRegistry) =
+        partner.resouceFor(partnerResourceResouceRegistry)
+}
 
-class CreateLoanApplicationUseCase() {
+class CreateLoanApplicationUseCase(
+    private val partnerFormValidationResouceRegistry: PartnerFormValidationResouceRegistry
+) {
     fun create(loanApplication: LoanApplication) {
         validate(loanApplication)
     }
 
     private fun validate(loanApplication: LoanApplication) {
-        when(loanApplication.partner) {
-            is ScdPartner -> ScdFormValidation().execute(loanApplication)
-            is PanPartner -> PanFormValidation().execute(loanApplication)
-        }
+        loanApplication.resourceFor(partnerFormValidationResouceRegistry).execute(loanApplication)
     }
 }
