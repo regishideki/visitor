@@ -1,60 +1,37 @@
 package `if`
 
 interface Partner
-class ScdPartner: Partner
-class PanPartner: Partner
-
-interface DocumentSender {
-    fun send(document: Document) {}
-}
-class ScdDocumentSender: DocumentSender {
-    override fun send(document: Document) {}
-}
-class PanDocumentSender: DocumentSender {
-    override fun send(document: Document) {}
-}
+class Bmg: Partner
+class Pan: Partner
 
 interface FormValidation {
-    fun validate(loanApplication: LoanApplication)
+    fun validate(partner: Partner)
 }
 class ScdFormValidation: FormValidation {
-    override fun validate(loanApplication: LoanApplication) {}
+    override fun validate(partner: Partner) {
+        // do something
+    }
 }
 class PanFormValidation: FormValidation {
-    override fun validate(loanApplication: LoanApplication) {}
+    override fun validate(partner: Partner) {
+        // do something
+    }
 }
 
-class Document
-class LoanApplication(val partner: Partner, val document: Document)
-
-class CreateLoanApplicationUseCase(
+class CreatePartnerUseCase(
     private val scdFormValidation: ScdFormValidation,
     private val panFormValidation: PanFormValidation
 ) {
-    fun create(loanApplication: LoanApplication) {
-        validate(loanApplication)
+    fun update(partner: Partner) {
+        validate(partner)
+        // do something
     }
 
-    private fun validate(loanApplication: LoanApplication) {
-        when(loanApplication.partner) {
-            is ScdPartner -> scdFormValidation.validate(loanApplication)
-            is PanPartner -> panFormValidation.validate(loanApplication)
+    private fun validate(partner: Partner) {
+        when(partner) {
+            is Bmg -> scdFormValidation.validate(partner)
+            is Pan -> panFormValidation.validate(partner)
         }
     }
 }
 
-class SendLoanApplicationDocumentUseCase(
-    private val scdDocumentSender: ScdDocumentSender,
-    private val panDocumentSender: PanDocumentSender
-) {
-    fun send(loanApplication: LoanApplication) {
-        validate(loanApplication)
-    }
-
-    private fun validate(loanApplication: LoanApplication) {
-        when(loanApplication.partner) {
-            is ScdPartner -> scdDocumentSender.send(loanApplication.document)
-            is PanPartner -> panDocumentSender.send(loanApplication.document)
-        }
-    }
-}

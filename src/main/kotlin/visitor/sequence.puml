@@ -1,0 +1,14 @@
+@startuml
+participant Client
+participant PartnerResourceRegistry as "<Resource>PartnerResourceRegistry"
+participant Partner as "<Partner>"
+participant PartnerResource as "<Partner><Resource>"
+
+Client -> PartnerResourceRegistry: resourceFor(<Partner>)
+PartnerResourceRegistry -> Partner: resourceFor(this)
+Partner -> PartnerResourceRegistry: resourceFor<Partner>(this)
+PartnerResourceRegistry -> PartnerResource: new(<Partner>)
+PartnerResource --> PartnerResourceRegistry: this
+PartnerResourceRegistry --> Client: <Partner><Resource>
+Client -> PartnerResource: execute
+@enduml

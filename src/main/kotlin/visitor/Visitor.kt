@@ -1,60 +1,55 @@
 package visitor
 
 interface Partner {
-    fun resouceFor(registry: PartnerResouceRegistry): PartnerResouce
+    fun resourceFor(registryPartner: PartnerResourceRegistry): PartnerResource
 }
-class ScdPartner: Partner {
-    override fun resouceFor(registry: PartnerResouceRegistry) = registry.resourceForScd()
+class Bmg: Partner {
+    override fun resourceFor(registryPartner: PartnerResourceRegistry) =
+        registryPartner.resourceForBmg(this)
 }
-class PanPartner: Partner {
-    override fun resouceFor(registry: PartnerResouceRegistry) = registry.resourceForPan()
-}
-
-interface PartnerResouce {
-    fun execute(loanApplication: LoanApplication)
+class Pan: Partner {
+    override fun resourceFor(registryPartner: PartnerResourceRegistry) =
+        registryPartner.resourceForPan(this)
 }
 
-class ScdDocumentSender: PartnerResouce {
-    override fun execute(loanApplication: LoanApplication) {}
-}
-class PanDocumentSender: PartnerResouce {
-    override fun execute(loanApplication: LoanApplication) {}
+interface PartnerResource {
+    fun execute()
 }
 
-class ScdFormValidation: PartnerResouce {
-    override fun execute(loanApplication: LoanApplication) {}
+class BmgFormValidation(
+    private val partner: Partner
+): PartnerResource {
+    override fun execute() {
+        // do something
+    }
 }
-class PanFormValidation: PartnerResouce {
-    override fun execute(loanApplication: LoanApplication) {}
-}
-
-interface PartnerResouceRegistry {
-    fun resourceForScd(): PartnerResouce
-    fun resourceForPan(): PartnerResouce
-}
-class PartnerFormValidationResouceRegistry: PartnerResouceRegistry {
-    override fun resourceForScd() = ScdFormValidation()
-    override fun resourceForPan() = PanFormValidation()
-}
-class PartnerDocumentResouceRegistry: PartnerResouceRegistry {
-    override fun resourceForScd() = ScdDocumentSender()
-    override fun resourceForPan() = PanDocumentSender()
+class PanFormValidation(
+    private val partner: Partner
+): PartnerResource {
+    override fun execute() {
+        // do something
+    }
 }
 
-class Document
-class LoanApplication(val partner: Partner, val document: Document) {
-    fun resourceFor(partnerResourceResouceRegistry: PartnerResouceRegistry) =
-        partner.resouceFor(partnerResourceResouceRegistry)
+interface PartnerResourceRegistry {
+    fun resourceFor(partner: Partner) = partner.resourceFor(this)
+    fun resourceForBmg(partner: Partner): PartnerResource
+    fun resourceForPan(partner: Partner): PartnerResource
+}
+class FormValidationPartnerResourceRegistry: PartnerResourceRegistry {
+    override fun resourceForBmg(partner: Partner) = BmgFormValidation(partner)
+    override fun resourceForPan(partner: Partner) = PanFormValidation(partner)
 }
 
-class CreateLoanApplicationUseCase(
-    private val partnerFormValidationResouceRegistry: PartnerFormValidationResouceRegistry
+class CreatePartnerUseCase(
+    private val formValidationPartnerResourceRegistry: FormValidationPartnerResourceRegistry
 ) {
-    fun create(loanApplication: LoanApplication) {
-        validate(loanApplication)
+    fun update(partner: Partner) {
+        validate(partner)
+        // do something
     }
 
-    private fun validate(loanApplication: LoanApplication) {
-        loanApplication.resourceFor(partnerFormValidationResouceRegistry).execute(loanApplication)
+    private fun validate(partner: Partner) {
+        formValidationPartnerResourceRegistry.resourceFor(partner).execute()
     }
 }
