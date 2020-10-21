@@ -20,14 +20,14 @@ class BmgFormValidation(
     private val partner: Partner
 ): PartnerResource {
     override fun execute() {
-        // do something
+        println("executing BMG Form Validation")
     }
 }
 class PanFormValidation(
     private val partner: Partner
 ): PartnerResource {
     override fun execute() {
-        // do something
+        println("executing Pan Form Validation")
     }
 }
 
@@ -41,7 +41,7 @@ class FormValidationPartnerResourceRegistry: PartnerResourceRegistry {
     override fun resourceForPan(partner: Partner) = PanFormValidation(partner)
 }
 
-class CreatePartnerUseCase(
+class UpdatePartnerUseCase(
     private val formValidationPartnerResourceRegistry: FormValidationPartnerResourceRegistry
 ) {
     fun update(partner: Partner) {
