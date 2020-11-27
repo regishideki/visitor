@@ -1,4 +1,4 @@
-package factory
+package abstractfactory
 
 // ======== Partner =========
 
@@ -32,20 +32,34 @@ class PanFormValidation(
 
 // ======== Factory =========
 
-class PartnerFormValidationFactory {
-    fun validationFor(partner: Partner): FormValidation {
-        return when(partner) {
-            is Bmg -> BmgFormValidation(partner)
-            is Pan -> PanFormValidation(partner)
-            else -> throw RuntimeException()
-        }
+class PartnerAbstractFactory {
+    fun factoryFor(partner: Partner) = when(partner) {
+        is Bmg -> BmgFactory(partner)
+        is Pan -> PanFactory(partner)
+        else -> throw RuntimeException()
     }
+}
+
+interface PartnerFactory {
+    fun formValidation(): FormValidation
+}
+
+class BmgFactory(
+    private val partner: Partner
+): PartnerFactory {
+    override fun formValidation() = BmgFormValidation(partner)
+}
+
+class PanFactory(
+    private val partner: Partner
+): PartnerFactory {
+    override fun formValidation() = PanFormValidation(partner)
 }
 
 // ======== UseCase =========
 
 class UpdatePartnerUseCase(
-    private val partnerFormValidationFactory: PartnerFormValidationFactory
+    private val partnerAbstractFactory: PartnerAbstractFactory
 ) {
     fun update(partner: Partner) {
         validate(partner)
@@ -53,6 +67,9 @@ class UpdatePartnerUseCase(
     }
 
     private fun validate(partner: Partner) {
-        partnerFormValidationFactory.validationFor(partner).validate()
+        partnerAbstractFactory
+            .factoryFor(partner)
+            .formValidation()
+            .validate()
     }
 }
