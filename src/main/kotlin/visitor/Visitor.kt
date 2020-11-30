@@ -3,17 +3,17 @@ package visitor
 // ======== Partner =========
 
 interface Partner {
-    fun resourceFor(partnerResouceRegistry: PartnerResourceRegistry): PartnerResource
+    fun resourceFor(partnerResourceFactory: PartnerResouceFactory): PartnerResource
 }
 
 class Bmg: Partner {
-    override fun resourceFor(partnerResouceRegistry: PartnerResourceRegistry) =
-        partnerResouceRegistry.resourceForBmg(this)
+    override fun resourceFor(partnerResourceFactory: PartnerResouceFactory) =
+        partnerResourceFactory.resourceForBmg(this)
 }
 
 class Pan: Partner {
-    override fun resourceFor(partnerResouceRegistry: PartnerResourceRegistry) =
-        partnerResouceRegistry.resourceForPan(this)
+    override fun resourceFor(partnerResourceFactory: PartnerResouceFactory) =
+        partnerResourceFactory.resourceForPan(this)
 }
 
 // ======== Resource =========
@@ -38,17 +38,17 @@ class PanFormValidation(
     }
 }
 
-// ======== GenericRegistry =========
+// ======== Generic Factory =========
 
-interface PartnerResourceRegistry {
+interface PartnerResouceFactory {
     fun resourceFor(partner: Partner) = partner.resourceFor(this)
     fun resourceForBmg(partner: Partner): PartnerResource
     fun resourceForPan(partner: Partner): PartnerResource
 }
 
-// ======== SpecificRegistry =========
+// ======== Specific Factory =========
 
-class FormValidationPartnerResourceRegistry: PartnerResourceRegistry {
+class FormValidationPartnerResouceFactory: PartnerResouceFactory {
     override fun resourceForBmg(partner: Partner) = BmgFormValidation(partner)
     override fun resourceForPan(partner: Partner) = PanFormValidation(partner)
 }
@@ -56,7 +56,7 @@ class FormValidationPartnerResourceRegistry: PartnerResourceRegistry {
 // ======== UseCase =========
 
 class UpdatePartnerUseCase(
-    private val formValidationPartnerResourceRegistry: FormValidationPartnerResourceRegistry
+    private val formValidationPartnerResourceFactory: FormValidationPartnerResouceFactory
 ) {
     fun update(partner: Partner) {
         validate(partner)
@@ -64,6 +64,6 @@ class UpdatePartnerUseCase(
     }
 
     private fun validate(partner: Partner) {
-        formValidationPartnerResourceRegistry.resourceFor(partner).execute()
+        formValidationPartnerResourceFactory.resourceFor(partner).execute()
     }
 }
