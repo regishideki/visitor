@@ -3,16 +3,16 @@ package visitor
 // ======== Partner =========
 
 interface Partner {
-    fun resourceFor(partnerResourceFactory: PartnerResouceFactory): PartnerResource
+    fun resourceFor(partnerResourceFactory: PartnerResourceFactory): PartnerResource
 }
 
 class Bmg: Partner {
-    override fun resourceFor(partnerResourceFactory: PartnerResouceFactory) =
+    override fun resourceFor(partnerResourceFactory: PartnerResourceFactory) =
         partnerResourceFactory.resourceForBmg(this)
 }
 
 class Pan: Partner {
-    override fun resourceFor(partnerResourceFactory: PartnerResouceFactory) =
+    override fun resourceFor(partnerResourceFactory: PartnerResourceFactory) =
         partnerResourceFactory.resourceForPan(this)
 }
 
@@ -38,17 +38,17 @@ class PanFormValidation(
     }
 }
 
-// ======== Generic Factory =========
+// ======== Partner Resource Factory Interface =========
 
-interface PartnerResouceFactory {
+interface PartnerResourceFactory {
     fun resourceFor(partner: Partner) = partner.resourceFor(this)
     fun resourceForBmg(partner: Partner): PartnerResource
     fun resourceForPan(partner: Partner): PartnerResource
 }
 
-// ======== Specific Factory =========
+// ======== Partner FormValidation Factory  =========
 
-class FormValidationPartnerResouceFactory: PartnerResouceFactory {
+class FormValidationPartnerResouceFactory: PartnerResourceFactory {
     override fun resourceForBmg(partner: Partner) = BmgFormValidation(partner)
     override fun resourceForPan(partner: Partner) = PanFormValidation(partner)
 }
@@ -64,6 +64,8 @@ class UpdatePartnerUseCase(
     }
 
     private fun validate(partner: Partner) {
-        formValidationPartnerResourceFactory.resourceFor(partner).execute()
+        formValidationPartnerResourceFactory
+          .resourceFor(partner)
+          .execute()
     }
-}
+
